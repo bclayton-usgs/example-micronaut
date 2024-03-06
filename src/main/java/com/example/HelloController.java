@@ -38,15 +38,9 @@ import org.crac.Resource;
  */
 @Controller("/")
 @Validated
-public class HelloController implements OrderedResource{
-    
+public class HelloController {
+
     private static Logger LOGGER = Logger.getAnonymousLogger();
-
-    private final HelloController controller;
-
-    HelloController(HelloController controller) {
-        this.controller = controller;
-    }
 
     @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
     public String hello(@NotBlank String name) {
@@ -63,12 +57,12 @@ public class HelloController implements OrderedResource{
         LOGGER.info("After restore event");
     }
 
-    @Override
-    public void beforeCheckpoint(Context<? extends Resource> context) throws Exception {
-        Core.getGlobalContext().register(context);
-    }
+    // @Override
+    // public void beforeCheckpoint(Context<? extends Resource> context) throws Exception {
+    //     Core.getGlobalContext().register(context);
+    // }
 
-    @Override
-    public void afterRestore(Context<? extends Resource> context) throws Exception {
-    }
+    // @Override
+    // public void afterRestore(Context<? extends Resource> context) throws Exception {
+    // }
 }
