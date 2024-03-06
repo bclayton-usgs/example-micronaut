@@ -15,12 +15,22 @@
  */
 package com.example;
 
+import io.micronaut.crac.OrderedResource;
+import io.micronaut.crac.events.AfterRestoreEvent;
+import io.micronaut.crac.events.BeforeCheckpointEvent;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.validation.Validated;
 
+import java.util.logging.Logger;
+
 import javax.validation.constraints.NotBlank;
+
+import org.crac.Context;
+import org.crac.Core;
+import org.crac.Resource;
 
 /**
  * @author Graeme Rocher
@@ -28,10 +38,37 @@ import javax.validation.constraints.NotBlank;
  */
 @Controller("/")
 @Validated
-public class HelloController {
+public class HelloController implements OrderedResource{
+    
+    private static Logger LOGGER = Logger.getAnonymousLogger();
+
+    private final HelloController controller;
+
+    HelloController(HelloController controller) {
+        this.controller = controller;
+    }
 
     @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
     public String hello(@NotBlank String name) {
         return "Hello " + name + "!";
+    }
+
+    @EventListener
+    void beforeCheckpoint(BeforeCheckpointEvent event) {
+        LOGGER.info("Before checkpoint event");
+    }
+
+    @EventListener
+    void afterRestore(AfterRestoreEvent event) {
+        LOGGER.info("After restore event");
+    }
+
+    @Override
+    public void beforeCheckpoint(Context<? extends Resource> context) throws Exception {
+        Core.getGlobalContext().register(context);
+    }
+
+    @Override
+    public void afterRestore(Context<? extends Resource> context) throws Exception {
     }
 }
